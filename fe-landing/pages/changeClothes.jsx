@@ -6,7 +6,7 @@ export default function ImageUploader() {
   const [resultData, setResultData] = useState(null);
   const [imageResult, setImageResult] = useState(null);
   const [socket, setSocket] = useState(null);
-  const [receivedImage, setReceivedImage] = useState(false); // Theo dõi ảnh đã nhận
+  const [receivedImage, setReceivedImage] = useState(false);
 
   const [captionImage, setCaptionImage] = useState(null);
 
@@ -28,7 +28,7 @@ export default function ImageUploader() {
       
       if (response.image) {
         setImageResult(`data:image/png;base64,${response.image}`);
-        setReceivedImage(true); // Đánh dấu đã nhận ảnh
+        setReceivedImage(true);
       }
     };
 
@@ -37,10 +37,10 @@ export default function ImageUploader() {
     return () => {
       if (receivedImage) {
         console.log("🔌 Đóng WebSocket sau khi nhận ảnh xong");
-        ws.close(); // Chỉ đóng khi đã nhận ảnh
+        ws.close();
       }
     };
-  }, [receivedImage]); // Theo dõi khi nhận ảnh thì mới đóng WebSocket
+  }, [receivedImage]);
 
   const handleImageChange = (e) => {
     const { name, files } = e.target;
@@ -83,7 +83,7 @@ export default function ImageUploader() {
       image2: image2Base64,
     });
 
-    setReceivedImage(false); // Reset trạng thái nhận ảnh
+    setReceivedImage(false);
     socket.send(payload);
   };
 
@@ -96,92 +96,190 @@ export default function ImageUploader() {
   };
 
   return (
-    <div className="flex flex-col items-center p-4 space-y-4">
-      <div>
-        <p>Clothes</p>
-        <input type="file" name="image1" onChange={handleImageChange} className="border p-2" />
+    <div style={{
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      padding: '2rem',
+      maxWidth: '800px',
+      margin: '0 auto',
+      backgroundColor: '#f9fafb',
+      borderRadius: '12px',
+      boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+      gap: '1.5rem'
+    }}>
+      <div style={{ display: 'flex', gap: '2rem', flexWrap: 'wrap', justifyContent: 'center' }}>
+        {/* Clothes Upload and Preview */}
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem' }}>
+          <p style={{ fontSize: '1.1rem', fontWeight: '600', color: '#1f2937' }}>Clothes</p>
+          <div style={{
+            width: '300px',
+            height: '300px',
+            border: '2px dashed #d1d5db',
+            borderRadius: '8px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            backgroundColor: '#ffffff',
+            overflow: 'hidden'
+          }}>
+            {files.image1 ? (
+              <img
+                src={URL.createObjectURL(files.image1)}
+                alt="Clothes preview"
+                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+              />
+            ) : (
+              <span style={{ color: '#6b7280', fontSize: '1rem' }}>No image</span>
+            )}
+          </div>
+          <input
+            type="file"
+            name="image1"
+            onChange={handleImageChange}
+            style={{
+              padding: '0.5rem',
+              border: '2px solid #d1d5db',
+              borderRadius: '8px',
+              backgroundColor: '#ffffff',
+              width: '100%',
+              marginTop: '0.5rem'
+            }}
+          />
+        </div>
+
+        {/* Person Upload and Preview */}
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem' }}>
+          <p style={{ fontSize: '1.1rem', fontWeight: '600', color: '#1f2937' }}>Person</p>
+          <div style={{
+            width: '300px',
+            height: '300px',
+            border: '2px dashed #d1d5db',
+            borderRadius: '8px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            backgroundColor: '#ffffff',
+            overflow: 'hidden'
+          }}>
+            {files.image2 ? (
+              <img
+                src={URL.createObjectURL(files.image2)}
+                alt="Person preview"
+                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+              />
+            ) : (
+              <span style={{ color: '#6b7280', fontSize: '1rem' }}>No image</span>
+            )}
+          </div>
+          <input
+            type="file"
+            name="image2"
+            onChange={handleImageChange}
+            style={{
+              padding: '0.5rem',
+              border: '2px solid #d1d5db',
+              borderRadius: '8px',
+              backgroundColor: '#ffffff',
+              width: '100%',
+              marginTop: '0.5rem'
+            }}
+          />
+        </div>
       </div>
-      <div>
-        <p>Person</p>
-        <input type="file" name="image2" onChange={handleImageChange} className="border p-2" />
-      </div>
 
-
-
-
-      <label className="label">Ảnh để AI viết quảng cáo:</label>
-      <div
-          style={{
-          width: "200px",
-          height: "200px",
-          backgroundColor: "#f0f0f0",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          borderRadius: "10px",
-          overflow: "hidden",
-          marginBottom: "10px",
-          }}
-      >
-          {captionImage ? (
-          <img src={URL.createObjectURL(captionImage)} alt="Ảnh chính" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-          ) : (
-          <span style={{ color: "#999" }}>Chưa có ảnh</span>
-          )}
-      </div>
-      <label htmlFor="file-upload" className="custom-file-upload">
-          Upload ảnh
-      </label>
-      <input id="file-upload" type="file" accept="image/*" onChange={handleCaptionImage} />
-      <br />
-
-
-
-
-      <div className="flex space-x-4">
+      {/* Checkbox Group */}
+      <div style={{ display: 'flex', gap: '2rem', justifyContent: 'center' }}>
         <div>
-          <label>
+          <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#374151', cursor: 'pointer' }}>
             <input
               type="checkbox"
               name="upperbody"
               checked={checkboxes.upperbody}
               onChange={handleCheckboxChange}
-            />{" "}
+              style={{ width: '1.25rem', height: '1.25rem', accentColor: '#3b82f6' }}
+            />
             Upper Body
           </label>
         </div>
         <div>
-          <label>
+          <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#374151', cursor: 'pointer' }}>
             <input
               type="checkbox"
               name="lowerbody"
               checked={checkboxes.lowerbody}
               onChange={handleCheckboxChange}
-            />{" "}
+              style={{ width: '1.25rem', height: '1.25rem', accentColor: '#3b82f6' }}
+            />
             Lower Body
           </label>
         </div>
       </div>
 
-      <button onClick={handleSubmit} className="bg-blue-500 text-white p-2 rounded">
+      {/* Submit Button */}
+      <button
+        onClick={handleSubmit}
+        style={{
+          backgroundColor: '#3b82f6',
+          color: '#ffffff',
+          padding: '0.5rem 1rem',
+          borderRadius: '8px',
+          border: 'none',
+          cursor: 'pointer',
+          fontSize: '1rem',
+          fontWeight: '500',
+          transition: 'background-color 0.3s ease'
+        }}
+        onMouseOver={(e) => (e.target.style.backgroundColor = '#2563eb')}
+        onMouseOut={(e) => (e.target.style.backgroundColor = '#3b82f6')}
+      >
         Send
       </button>
 
-      {/* Hiển thị phản hồi từ server */}
+      {/* Server Response */}
       {resultData && (
-        <div className="mt-4 p-4 border rounded">
-          <h3 className="text-lg font-bold">Phản hồi từ Server:</h3>
-          <pre className="text-sm">{JSON.stringify(resultData, null, 2)}</pre>
+        <div style={{
+          marginTop: '1rem',
+          padding: '1rem',
+          border: '1px solid #d1d5db',
+          borderRadius: '8px',
+          backgroundColor: '#ffffff',
+          width: '100%'
+        }}>
+          <h3 style={{ fontSize: '1.25rem', fontWeight: '700', color: '#1f2937', marginBottom: '0.5rem' }}>
+            Phản hồi từ Server:
+          </h3>
+          <pre style={{ fontSize: '0.875rem', color: '#374151', whiteSpace: 'pre-wrap' }}>
+            {JSON.stringify(resultData, null, 2)}
+          </pre>
         </div>
       )}
 
-      {/* Hiển thị ảnh nhận từ WebSocket */}
-      {imageResult && (
-        <div className="mt-4 p-4 border rounded">
-          <h3 className="text-lg font-bold">Ảnh nhận từ Server:</h3>
-          <img src={imageResult} alt="Kết quả từ server" className="max-w-full border" />
+      {/* Result Image Preview */}
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem' }}>
+        <p style={{ fontSize: '1.1rem', fontWeight: '600', color: '#1f2937' }}>Result</p>
+        <div style={{
+          width: '300px',
+          height: '300px',
+          border: '2px dashed #d1d5db',
+          borderRadius: '8px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          backgroundColor: '#ffffff',
+          overflow: 'hidden'
+        }}>
+          {imageResult ? (
+            <img
+              src={imageResult}
+              alt="Result from server"
+              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+            />
+          ) : (
+            <span style={{ color: '#6b7280', fontSize: '1rem' }}>No result</span>
+          )}
         </div>
-      )}
+      </div>
     </div>
   );
 }
